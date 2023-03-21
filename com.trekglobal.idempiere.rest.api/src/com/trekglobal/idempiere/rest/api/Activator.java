@@ -25,7 +25,9 @@
 **********************************************************************/
 package com.trekglobal.idempiere.rest.api;
 
+import org.adempiere.base.Core;
 import org.adempiere.plugin.utils.Incremental2PackActivator;
+import org.osgi.framework.BundleContext;
 
 /**
  * 
@@ -33,4 +35,12 @@ import org.adempiere.plugin.utils.Incremental2PackActivator;
  *
  */
 public class Activator extends Incremental2PackActivator {
+	
+	@Override
+	public void start(BundleContext context) throws Exception {
+		Core.getMappedModelFactory().scan(context, "com.trekglobal.idempiere.rest.api.model");
+		Core.getMappedProcessFactory().scan(context, "com.trekglobal.idempiere.rest.api.process");
+
+		super.start(context);
+	}
 }
