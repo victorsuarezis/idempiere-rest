@@ -20,58 +20,50 @@
 * MA 02110-1301, USA.                                                 *
 *                                                                     *
 * Contributors:                                                       *
-* - BX Service GmbH                                                   *
-* - Diego Ruiz                                                        *
+* - Trek Global Corporation                                           *
+* - Heng Sin Low                                                      *
 **********************************************************************/
-package com.trekglobal.idempiere.rest.api.json;
+package com.trekglobal.idempiere.rest.api.v1.jwt;
 
-import javax.ws.rs.core.Response.Status;
+import java.util.UUID;
 
-import org.adempiere.exceptions.AdempiereException;
+import org.compiere.model.MSysConfig;
+import org.compiere.util.CacheMgt;
+import org.compiere.util.Env;
 
-public class IDempiereRestException extends AdempiereException {
+/**
+ * 
+ * @author matheus.marcelino
+ *
+ */
+public class SysConfigTokenSecretProvider implements ITokenSecretProvider {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3555412217944639699L;
-	
-	private Status status;
-	private String title;
-	
-	/**
-	 * @param message
-	 * @param error -> Response status error
-	 */
-	public IDempiereRestException(String message, Status error) {
-		super(message);
-		setErrorResponseStatus(error);
+	public static final String REST_TOKEN_SECRET = "REST_TOKEN_SECRET";
+
+	private SysConfigTokenSecretProvider() {
+		String secret = MSysConfig.getValue(REST_TOKEN_SECRET);
+		if (secret == null) {
+			try {
+				MSysConfig.setCrossTenantSafe();
+				MSysConfig sysConfig = new MSysConfig(Env.getCtx(), 0, null);
+				sysConfig.set_ValueNoCheck(MSysConfig.COLUMNNAME_AD_Client_ID, 0);
+				sysConfig.set_ValueNoCheck(MSysConfig.COLUMNNAME_AD_Org_ID, 0);
+				sysConfig.setName(REST_TOKEN_SECRET);
+				sysConfig.setValue(UUID.randomUUID().toString());
+				sysConfig.saveEx();
+				CacheMgt.get().reset(MSysConfig.Table_Name);
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				MSysConfig.clearCrossTenantSafe();
+			}
+		}
 	}
-	
-	/**
-	 * @param title
-	 * @param message
-	 * @param error -> Response status error
-	 */
-	public IDempiereRestException(String title, String message, Status error) {
-		super(message);
-		setErrorResponseStatus(error);
-		setTitle(title);
+
+	@Override
+	public String getSecret() {
+		return MSysConfig.getValue(REST_TOKEN_SECRET);
 	}
-	
-	public void setErrorResponseStatus(Status status) {
-		this.status = status;
-	}
-	
-	public Status getErrorResponseStatus() {
-		return status;
-	}
-	
-	public void setTitle(String title) {
-		this.title= title;
-	}
-	
-	public String getTitle() {
-		return title;
-	}
+
+	public final static SysConfigTokenSecretProvider instance = new SysConfigTokenSecretProvider();
 }
