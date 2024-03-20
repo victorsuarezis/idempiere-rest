@@ -27,12 +27,15 @@ package com.trekglobal.idempiere.rest.api.json;
 
 import static org.compiere.util.DisplayType.Account;
 import static org.compiere.util.DisplayType.Binary;
+import static org.compiere.util.DisplayType.Button;
+import static org.compiere.util.DisplayType.ID;
 import static org.compiere.util.DisplayType.Image;
 import static org.compiere.util.DisplayType.Location;
 import static org.compiere.util.DisplayType.Locator;
 import static org.compiere.util.DisplayType.PAttribute;
 import static org.compiere.util.DisplayType.Payment;
-import static org.compiere.util.DisplayType.Button;
+import static org.compiere.util.DisplayType.RecordID;
+import static org.compiere.util.DisplayType.JSON;
 
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
@@ -178,7 +181,7 @@ public class TypeConverterUtils {
 		query.put("displayType", Integer.toString(displayType));
 		typeConverter = Service.locator().locate(ITypeConverter.class, query).getService();
 		if (typeConverter == null) {
-			if (((DisplayType.isNumeric(displayType) || displayType == Button) && value instanceof Number)) {
+			if (((DisplayType.isNumeric(displayType) || displayType == Button || displayType == RecordID || displayType == ID) && value instanceof Number)) {
 				typeConverter = new NumericTypeConverter();
 			} else if (DisplayType.isDate(displayType) && value instanceof Date) {
 				typeConverter = new DateTypeConverter();
@@ -195,6 +198,8 @@ public class TypeConverterUtils {
 				return new BinaryTypeConverter();
 			} else if (displayType == Image) {
 				return new ImageTypeConverter();		
+			} else if (displayType == JSON) {
+				return new JSONTypeConverter();		
 			}
 		}
 		return typeConverter;
@@ -207,7 +212,7 @@ public class TypeConverterUtils {
 		query.put("displayType", Integer.toString(displayType));
 		typeConverter = Service.locator().locate(ITypeConverter.class, query).getService();
 		if (typeConverter == null) {
-			if ((DisplayType.isNumeric(displayType) || displayType == Button) && (isNumber(value) || isString(value))) {
+			if ((DisplayType.isNumeric(displayType) || displayType == Button || displayType == RecordID || displayType == ID) && (isNumber(value) || isString(value))) {
 				typeConverter = new NumericTypeConverter();
 			} else if (DisplayType.isDate(displayType) && isString(value)) {
 				typeConverter = new DateTypeConverter();
@@ -225,6 +230,8 @@ public class TypeConverterUtils {
 			}
 			else if (displayType == Image) {
 				return new ImageTypeConverter();
+			} else if (displayType == JSON) {
+				return new JSONTypeConverter();		
 			}
 		}
 		return typeConverter;

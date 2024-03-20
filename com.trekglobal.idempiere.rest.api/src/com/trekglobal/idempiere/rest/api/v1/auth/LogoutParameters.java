@@ -20,28 +20,28 @@
 * MA 02110-1301, USA.                                                 *
 *                                                                     *
 * Contributors:                                                       *
-* - Trek Global Corporation                                           *
-* - Heng Sin Low                                                      *
+* - Carlos Ruiz - globalqss - bx-service                              *
 **********************************************************************/
-package com.trekglobal.idempiere.rest.api;
-
-import org.adempiere.base.Core;
-import org.adempiere.plugin.utils.Incremental2PackActivator;
-import org.osgi.framework.BundleContext;
+package com.trekglobal.idempiere.rest.api.v1.auth;
 
 /**
  * 
- * @author hengsin
+ * @author Carlos Ruiz
  *
  */
-public class Activator extends Incremental2PackActivator {
-	
-	@Override
-	public void start(BundleContext context) throws Exception {
-		Core.getMappedModelFactory().scan(context, "com.trekglobal.idempiere.rest.api.model");
-		Core.getMappedProcessFactory().scan(context, "com.trekglobal.idempiere.rest.api.process");
-		Core.getMappedColumnCalloutFactory().scan(context, "com.trekglobal.idempiere.rest.api.model");
+public class LogoutParameters {
 
-		super.start(context);
+	private String token;
+
+	public LogoutParameters() {
 	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
 }

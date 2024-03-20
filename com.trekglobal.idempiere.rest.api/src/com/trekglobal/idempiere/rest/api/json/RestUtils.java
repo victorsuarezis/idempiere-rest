@@ -171,11 +171,12 @@ public class RestUtils {
 			params.add(Env.getAD_Language(Env.getCtx()));
 		}
 
-		Query query = new Query(Env.getCtx(), table, whereClause, null);
+		Query query = new Query(Env.getCtx(), table, whereClause, null)
+				.setApplyAccessFilter(true, false)
+				.setParameters(params);
 
-		query.setApplyAccessFilter(true, false)
-			.setOnlyActiveRecords(true)
-			.setParameters(params);
+		if (! whereClause.toLowerCase().matches(".*\\bisactive\\b.*"))
+			query.setOnlyActiveRecords(true);
 
 		return query;
 	}
@@ -245,6 +246,21 @@ public class RestUtils {
 		
 		//If no window or no access to the window - check if the role has read/write access to the table
 		return role.isTableAccess(table.getAD_Table_ID(), false);
+	}
+	
+	public static boolean hasRoleUpdateAccess(int AD_Client_ID, int AD_Org_ID, int AD_Table_ID, int Record_ID, boolean isNew) {
+		return MRole.getDefault(Env.getCtx(), false).canUpdate(AD_Client_ID, AD_Org_ID, AD_Table_ID, Record_ID, isNew);
+	}
+	
+	/**
+	 * Check if the role has access to this column
+	 * @param AD_Table_ID
+	 * @param AD_Column_ID
+	 * @param readOnly
+	 * @return true if user has access
+	 */
+	public static boolean hasRoleColumnAccess(int AD_Table_ID, int AD_Column_ID, boolean readOnly) {
+		return MRole.getDefault(Env.getCtx(), false).isColumnAccess(AD_Table_ID, AD_Column_ID, readOnly);
 	}
 	
 	public static String getKeyColumnName(String tableName) {
