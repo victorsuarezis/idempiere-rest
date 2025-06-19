@@ -49,6 +49,7 @@ import org.adempiere.base.event.IEventManager;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MAttachment;
 import org.compiere.model.MAttachmentEntry;
+import org.compiere.model.MBPartnerLocation;
 import org.compiere.model.MTable;
 import org.compiere.model.MWindow;
 import org.compiere.model.PO;
@@ -79,6 +80,7 @@ import com.trekglobal.idempiere.rest.api.json.expand.ExpandParser;
 import com.trekglobal.idempiere.rest.api.json.expand.ExpandUtils;
 import com.trekglobal.idempiere.rest.api.json.filter.ConvertedQuery;
 import com.trekglobal.idempiere.rest.api.json.filter.IQueryConverter;
+import com.trekglobal.idempiere.rest.api.model.Custom_PartnerLocation;
 import com.trekglobal.idempiere.rest.api.v1.resource.ModelResource;
 import com.trekglobal.idempiere.rest.api.v1.resource.WindowResource;
 import com.trekglobal.idempiere.rest.api.v1.resource.file.FileStreamingOutput;
@@ -269,7 +271,13 @@ public class ModelResourceImpl implements ModelResource {
 			po.set_TrxName(trx.getTrxName());
 			fireRestSaveEvent(po, PO_BEFORE_REST_SAVE, true);
 			try {
-				if (! po.validForeignKeys()) {
+				if(po.get_TableName().equals(Custom_PartnerLocation.Table_Name)) {
+					Custom_PartnerLocation location = (Custom_PartnerLocation)po;
+					if (! location.validForeignKeys()) {
+						String msg = CLogger.retrieveErrorString("Foreign key validation error");
+						throw new AdempiereException(msg);
+					}
+				}else if (! po.validForeignKeys()) {
 					String msg = CLogger.retrieveErrorString("Foreign key validation error");
 					throw new AdempiereException(msg);
 				}
@@ -338,7 +346,13 @@ public class ModelResourceImpl implements ModelResource {
 							childPO.set_TrxName(trx.getTrxName());
 							childPO.set_ValueOfColumn(RestUtils.getKeyColumnName(po.get_TableName()), po.get_ID());
 							fireRestSaveEvent(childPO, PO_BEFORE_REST_SAVE, true);
-						if (! childPO.validForeignKeys()) {
+						if(childPO.get_TableName().equals(MBPartnerLocation.Table_Name)) {
+							Custom_PartnerLocation location = new Custom_PartnerLocation(Env.getCtx(), childPO.get_ID(), childPO.get_TrxName());
+							if (! location.validForeignKeys()) {
+								String msg = CLogger.retrieveErrorString("Foreign key validation error");
+								throw new AdempiereException(msg);
+							}
+						}else if (! childPO.validForeignKeys()) {
 								String msg = CLogger.retrieveErrorString("Foreign key validation error");
 								throw new AdempiereException(msg);
 							}
