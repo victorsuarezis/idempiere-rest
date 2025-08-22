@@ -448,7 +448,13 @@ public class ModelResourceImpl implements ModelResource {
 									}
 									childPO.set_TrxName(trx.getTrxName());
 									fireRestSaveEvent(childPO, PO_BEFORE_REST_SAVE, false);
-									if (! childPO.validForeignKeys()) {
+									if(childPO.get_TableName().equals(MBPartnerLocation.Table_Name)) {
+										Custom_PartnerLocation location = new Custom_PartnerLocation(Env.getCtx(), childPO.get_ID(), childPO.get_TrxName());
+										if (! location.validForeignKeys()) {
+											String msg = CLogger.retrieveErrorString("Foreign key validation error");
+											throw new AdempiereException(msg);
+										}
+									}else if (! childPO.validForeignKeys()) {
 										String msg = CLogger.retrieveErrorString("Foreign key validation error");
 										throw new AdempiereException(msg);
 									}
