@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "66279549-4f8a-47d0-bee8-707a8d6a6cb3",
-		"name": "trekglobal-idempiere-rest",
+		"name": "dev-ntn.applikt.com",
 		"description": "Import or create an environment with the variables: host, port, protocol, userName, password, clientId, roleId, organizationId, warehouseId, language, sysuserName and syspassword\n\nRun POST api/v1/auth/tokens to get the first authentication token.\n\nThen run PUT api/v1/auth/tokens to get the second authentication token.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
